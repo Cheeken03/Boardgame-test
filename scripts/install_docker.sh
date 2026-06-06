@@ -26,3 +26,4 @@ sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plug
 
 
 sudo chmod 666 /var/run/docker.sock
+##test##
