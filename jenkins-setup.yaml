@@ -1,76 +1,94 @@
-# Create a service account for jenkins in the webapps namespace
-apiVersion: v1 
-kind: ServiceAccount 
-metadata: 
-  name: jenkins   
-  namespace: webapps 
-
-# Create role for jenkins to manage resources in the webapps namespace
+# This YAML file sets up a ServiceAccount, Role, and RoleBinding for Jenkins in the "webapps" namespace. It also creates a secret for Jenkins to use the service account.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: jenkins
+  namespace: webapps
+---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  name: app-role
+  name: jenkins-role
   namespace: webapps
 rules:
-- apiGroups:
-  - ""
-  resources:
-  - services
-  - pods
-  - configmaps
-  - secrets
-  - endpoints
-  verbs:
-  - get
-  - list
-  - watch
-  - create
-  - update
-  - patch
-  - delete
-- apiGroups:
-  - apps
-  resources:
-  - deployments
-  - replicasets
-  - daemonsets
-  verbs:
-  - get
-  - list
-  - watch
-  - create
-  - update
-  - patch
-  - delete
-- apiGroups:
-  - batch
-  resources:
-  - jobs
-  - cronjobs
-  verbs:
-  - get
-  - list
-  - watch
-  - create
-  - update
-  - patch
-  - delete
+  # Core API resources
+  - apiGroups: [""]
+    resources:
+      - pods
+      - pods/log
+      - services
+      - configmaps
+      - secrets
+      - endpoints
+      - persistentvolumeclaims
+      - serviceaccounts
+    verbs:
+      - get
+      - list
+      - watch
+      - create
+      - update
+      - patch
+      - delete
 
-  # Create a role binding to bind the jenkins service account to the app-roleapiVersion: rbac.authorization.k8s.io/v1
+  # Apps API resources
+  - apiGroups: ["apps"]
+    resources:
+      - deployments
+      - replicasets
+      - daemonsets
+      - statefulsets
+    verbs:
+      - get
+      - list
+      - watch
+      - create
+      - update
+      - patch
+      - delete
+
+  # Batch resources
+  - apiGroups: ["batch"]
+    resources:
+      - jobs
+      - cronjobs
+    verbs:
+      - get
+      - list
+      - watch
+      - create
+      - update
+      - patch
+      - delete
+
+  # Networking
+  - apiGroups: ["networking.k8s.io"]
+    resources:
+      - ingresses
+      - networkpolicies
+    verbs:
+      - get
+      - list
+      - watch
+      - create
+      - update
+      - patch
+      - delete
+
+---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: app-rolebinding
+  name: jenkins-rolebinding
   namespace: webapps
+subjects:
+  - kind: ServiceAccount
+    name: jenkins
+    namespace: webapps
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: app-role
-subjects:
-- kind: ServiceAccount
-  name: jenkins
-  namespace: webapps
-
+  name: jenkins-role
 #Create a secret for jenkins to use the service
 apiVersion: v1 
 kind: Secret 
