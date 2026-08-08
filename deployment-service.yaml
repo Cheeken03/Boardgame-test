@@ -17,7 +17,7 @@ spec:
           image: souljay/boardgame:latest # Image that will be used to containers in the cluster
           imagePullPolicy: Always
           ports:
-            - containerPort: 8090 # The port that the container is running on in the cluster
+            - containerPort: 8080 # The port that the container is running on in the cluster
 
 
 ---
@@ -31,6 +31,6 @@ spec:
     app: boardgame
   ports:
     - protocol: "TCP"
-      port: 8090
-      targetPort: 8090 
+      port: 8080
+      targetPort: 8080 
   type: LoadBalancer # type of the service.
